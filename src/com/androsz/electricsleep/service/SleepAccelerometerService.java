@@ -7,6 +7,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.PendingIntent.CanceledException;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -59,6 +60,26 @@ public class SleepAccelerometerService extends Service implements
 		return super.onStartCommand(intent, flags, startId);
 	}
 
+	private void notifyMovement(String poop) {
+		int icon = R.drawable.icon;
+		CharSequence tickerText = poop;
+		long when = System.currentTimeMillis();
+
+		Notification notification = new Notification(icon, tickerText, when);
+
+		Context context = getApplicationContext();
+		CharSequence contentTitle = poop;
+		CharSequence contentText = poop;
+		Intent notificationIntent = new Intent(this, SleepActivity.class);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+				notificationIntent, 0);
+
+		notification.setLatestEventInfo(context, contentTitle, contentText,
+				contentIntent);
+
+		notificationManager.notify(1, notification);
+	}
+
 	public void onDestroy() {
 		super.onDestroy();
 
@@ -73,27 +94,32 @@ public class SleepAccelerometerService extends Service implements
 		// TODO Auto-generated method stub
 	}
 
+	private float[] lastAccel = { 0, 0, 0 };
+
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER)
 			return;
 
-		int icon = R.drawable.icon;
-		CharSequence tickerText = event.values[0] + " " + event.values[1] + " "
-				+ event.values[2];
-		long when = System.currentTimeMillis();
+		float[] currentAccel = event.values;
 
-		Notification notification = new Notification(icon, tickerText, when);
-		
-		Context context = getApplicationContext();
-		CharSequence contentTitle = "My notification";
-		CharSequence contentText = "Hello World!";
-		Intent notificationIntent = new Intent(this, SleepActivity.class);
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-
-		notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
-		
-		notificationManager.notify(1, notification);
+		/*float diff1 = java.lang.Math.abs(currentAccel[0] - lastAccel[0]);
+		float diff2 = java.lang.Math.abs(currentAccel[1] - lastAccel[1]);
+		float diff3 = java.lang.Math.abs(currentAccel[2] - lastAccel[2]);
+		float sensitivity = 0.01f;
+		if (diff1 > sensitivity || diff2 > sensitivity || diff3 > sensitivity)
+			notifyMovement(diff1 + " | " + diff2 + " | " + diff3);
+		lastAccel = currentAccel;*/
+		try {
+			PendingIntent.getBroadcast(
+					getApplicationContext(),
+					0,
+					new Intent(SleepActivity.UPDATE_CHART),
+					0).send();
+		} catch (CanceledException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
