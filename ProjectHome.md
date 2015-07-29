@@ -1,0 +1,3 @@
+ElectricSleep (a la _Do Androids Dream of Electric Sheep?_) is an Android application designed to monitor movements during sleep. The movements it registers can signify sleep stages. Aside from providing analysis and insight into the users' sleep patterns, the user can set an alarm to wake them at the best possible moment, so as to feel refreshed and more awake than with a traditional alarm.
+
+Please visit http://crowdin.net/project/electricsleep to help localize ElectricSleep!
